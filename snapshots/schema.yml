@@ -1,0 +1,32 @@
+version: 2
+
+snapshots:
+  - name: snap_customers
+    description: "Tracks the history of customer name changes using a Check strategy on customer_id."
+    columns:
+      - name: customer_id
+        description: "The unique primary key for the customer."
+        tests:
+          - not_null
+      - name: customer_name
+        description: "The name of the customer, monitored for changes."
+      - name: dbt_valid_from
+        description: "The timestamp when this version of the customer record became active."
+      - name: dbt_valid_to
+        description: "The timestamp when this version of the customer record expired. NULL if currently active."
+
+  - name: snap_products
+    description: "Tracks historical changes to product details, prices, and descriptions based on product_sku."
+    columns:
+      - name: product_sku
+        description: "The unique stock keeping unit code for the product."
+        tests:
+          - not_null
+      - name: product_name
+        description: "The name of the product."
+      - name: product_type
+        description: "The category classification of the product."
+      - name: price
+        description: "The base price of the product."
+      - name: description
+        description: "The detailed textual description of the product."

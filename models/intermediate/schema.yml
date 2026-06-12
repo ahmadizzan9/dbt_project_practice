@@ -1,0 +1,95 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Customer master dimension table aggregating order history cadence and lifetime value spending."
+    columns:
+      - name: customer_id
+        description: "The unique primary key for the customer."
+        tests:
+          - unique
+          - not_null
+      - name: customer_name
+        description: "The name of the customer."
+      - name: total_orders
+        description: "The total number of orders placed by this customer. Evaluates to 0 if they haven't ordered yet."
+        tests:
+          - not_null
+      - name: first_ordered_at
+        description: "The timestamp of the customer's oldest recorded purchase."
+      - name: last_ordered_at
+        description: "The timestamp of the customer's most recent purchase."
+      - name: lifetime_order_total
+        description: "Cumulative gross amount spent by this customer across all historical transactions."
+        tests:
+          - not_null
+
+  - name: dim_products
+    description: "Product master dimension table matching product catalog metadata against consolidated supply chain attributes."
+    columns:
+      - name: product_sku
+        description: "The unique master Stock Keeping Unit tracking code for the product."
+        tests:
+          - unique
+          - not_null
+      - name: product_name
+        description: "The catalog name of the product."
+      - name: product_type
+        description: "The category classification of the item."
+      - name: price
+        description: "The retail unit price tag of the item."
+      - name: description
+        description: "The text description explaining product features."
+      - name: supply_count
+        description: "Total count of active vendor supply linkages matching this SKU."
+      - name: total_supply_cost
+        description: "Aggregated financial cost overhead spent on purchasing the baseline supply logs."
+      - name: has_perishable_supply
+        description: "Boolean flag indicator showing TRUE if at least one associated supplier item is perishable."
+
+  - name: fact_order_items
+    description: "Granular transactional grain fact table tracking discrete line items sold with fully joined customer, store, and product dimensions."
+    columns:
+      - name: order_item_id
+        description: "The unique primary key identifying the individual transaction line item row."
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: "The identifier linking back to the parent order log."
+        tests:
+          - not_null
+      - name: ordered_at
+        description: "The precise timestamp indicating exactly when the checkout occurred."
+      - name: ordered_date
+        description: "The date of the purchase, used for calendar aggregation layers."
+        tests:
+          - not_null
+      - name: customer_id
+        description: "The ID tracking the registered customer profile."
+        tests:
+          - not_null
+      - name: customer_name
+        description: "Denormalized copy of the customer's name at checkout time."
+      - name: store_id
+        description: "The ID tracking the physical or digital retail location channel."
+        tests:
+          - not_null
+      - name: store_name
+        description: "Denormalized display name of the point of sale retail store."
+      - name: product_sku
+        description: "The reference code for the core commercial stock keeping unit inventory entity."
+        tests:
+          - not_null
+      - name: product_name
+        description: "Denormalized catalog name of the purchased item."
+      - name: product_type
+        description: "Denormalized retail category classification of the item."
+      - name: item_price
+        description: "The unit cost rate assigned to this item variant."
+      - name: subtotal
+        description: "The parent order's cumulative cost summation line value before tax."
+      - name: tax_paid
+        description: "The parent order's complete final calculated state or local sales tax surcharge fee."
+      - name: order_total
+        description: "The final absolute gross payout transaction cash value for the entire parent order ticket."
