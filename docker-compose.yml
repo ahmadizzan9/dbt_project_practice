@@ -33,7 +33,7 @@ services:
       - .:/usr/app
     working_dir: /usr/app
     ports:
-      - "8080:8080"
+      - "8888:8080"
 
 volumes:
   postgres_data:
